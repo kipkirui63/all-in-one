@@ -17,6 +17,18 @@ args = "pip install -r requirements.txt"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "cd crispwrite && python manage.py makemigrations payments"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd crispwrite && python manage.py makemigrations mainsite"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd crispwrite && python manage.py makemigrations api"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "cd crispwrite && python manage.py makemigrations"
 
 [[workflows.workflow.tasks]]

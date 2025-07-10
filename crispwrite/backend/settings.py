@@ -76,8 +76,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
+# Try PostgreSQL first, fallback to SQLite if connection fails
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Override with PostgreSQL if environment variables are available
+if all([os.getenv('PGDATABASE'), os.getenv('PGUSER'), os.getenv('PGPASSWORD'), os.getenv('PGHOST'), os.getenv('PGPORT')]):
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('PGDATABASE'),
         'USER': os.getenv('PGUSER'),
@@ -85,7 +94,6 @@ DATABASES = {
         'HOST': os.getenv('PGHOST'),
         'PORT': os.getenv('PGPORT'),
     }
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
