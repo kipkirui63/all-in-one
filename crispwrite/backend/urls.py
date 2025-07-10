@@ -1,3 +1,4 @@
+
 """
 URL configuration for backend project.
 
@@ -22,6 +23,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('api/', include('payments.urls')),
+    path('api/', include('mainsite.urls')),
 ]
 
 if settings.DEBUG:
