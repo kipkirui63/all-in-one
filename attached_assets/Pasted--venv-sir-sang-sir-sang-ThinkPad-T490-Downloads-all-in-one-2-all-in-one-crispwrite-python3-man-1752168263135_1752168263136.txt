@@ -1,0 +1,68 @@
+(venv) sir-sang@sir-sang-ThinkPad-T490:~/Downloads/all-in-one (2)/all-in-one/crispwrite$ python3 manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying admin.0001_initial...Traceback (most recent call last):
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 103, in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.UndefinedTable: relation "payments_user" does not exist
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/crispwrite/manage.py", line 23, in <module>
+    main()
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/crispwrite/manage.py", line 19, in main
+    execute_from_command_line(sys.argv)
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/core/management/base.py", line 416, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/core/management/base.py", line 460, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/core/management/base.py", line 107, in wrapper
+    res = handle_func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/core/management/commands/migrate.py", line 353, in handle
+    post_migrate_state = executor.migrate(
+                         ^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 135, in migrate
+    state = self._migrate_all_forwards(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 167, in _migrate_all_forwards
+    state = self.apply_migration(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/migrations/executor.py", line 252, in apply_migration
+    with self.connection.schema_editor(
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/base/schema.py", line 169, in __exit__
+    self.execute(sql, None)
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/postgresql/schema.py", line 45, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/base/schema.py", line 204, in execute
+    cursor.execute(sql, params)
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/sir-sang/Downloads/all-in-one (2)/all-in-one/venv/lib/python3.12/site-packages/django/db/backends/utils.py", line 103, in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.ProgrammingError: relation "payments_user" does not exist
+
+(venv) sir-sang@sir-sang-ThinkPad-T490:~/Downloads/all-in-one (2)/all-in-one/crispwrite$ 
