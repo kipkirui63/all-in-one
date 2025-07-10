@@ -13,4 +13,16 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
+args = "pip install -r requirements.txt"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd crispwrite && python manage.py makemigrations"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd crispwrite && python manage.py migrate"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
 args = "cd crispwrite && python manage.py runserver 0.0.0.0:5000"
