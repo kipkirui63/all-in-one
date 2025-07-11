@@ -1,20 +1,19 @@
 
 from rest_framework import serializers
-from django.contrib.auth import authenticate
-from .models import User, Tool, Subscription
+from .models import User, Subscription, Tool
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField()
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'is_active']
+        extra_kwargs = {'password': {'write_only': True}}
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
 
 class ToolSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
-        fields = ['id', 'name', 'description', 'price_id', 'is_active']
-
-class SubscriptionSerializer(serializers.ModelSerializer):
-    tool_name = serializers.CharField(source='tool.name', read_only=True)
-    
-    class Meta:
-        model = Subscription
-        fields = ['id', 'tool', 'tool_name', 'status', 'created_at', 'updated_at']
+        fields = '__all__'

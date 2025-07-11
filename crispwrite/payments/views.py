@@ -1,8 +1,7 @@
-
 import stripe
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -17,6 +16,10 @@ from .utils import generate_activation_link
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
+import json
+import os
+from rest_framework import status
+from .serializers import UserSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -314,33 +317,33 @@ def list_tools(request):
 def cancel_subscription(request):
     user = request.user
     tool_id = request.data.get("tool_id")
-    
+
     if not tool_id:
         return Response({"detail": "tool_id is required"}, status=400)
-    
+
     try:
         subscription = Subscription.objects.get(
             user=user,
             tool_id=tool_id,
             status="active"
         )
-        
+
         subscription.status = "canceled"
         subscription.save()
-        
+
         return Response({"detail": "Subscription canceled successfully"})
-        
+
     except Subscription.DoesNotExist:
         return Response({"detail": "Active subscription not found"}, status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
-    
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def my_subscriptions(request):
     user = request.user
     subscriptions = Subscription.objects.filter(user=user)
-    
+
     data = [{
         "id": sub.id,
         "tool": sub.tool.name,
@@ -349,5 +352,5 @@ def my_subscriptions(request):
         "created_at": sub.created_at,
         "updated_at": sub.updated_at
     } for sub in subscriptions]
-    
+
     return Response(data)
