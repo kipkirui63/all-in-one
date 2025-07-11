@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-BASE_URL="http://0.0.0.0:5000"
+BASE_URL="http://0.0.0.0:3000"
 
 echo "=========================================="
 echo "TESTING API ROUTES WITH CURL"

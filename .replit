@@ -37,7 +37,7 @@ args = "cd crispwrite && python manage.py migrate"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd crispwrite && python manage.py runserver 0.0.0.0:5000"
+args = "cd crispwrite && python manage.py runserver 0.0.0.0:3000"
 
 [[workflows.workflow]]
 name = "Test All Routes"
@@ -66,7 +66,7 @@ args = "cd crispwrite && python manage.py migrate"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd crispwrite && python manage.py runserver 0.0.0.0:5000 &"
+args = "cd crispwrite && python manage.py runserver 0.0.0.0:3000 &"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -103,8 +103,8 @@ args = "cd crispwrite && python manage.py migrate"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd crispwrite && python manage.py runserver 0.0.0.0:5000"
+args = "cd crispwrite && python manage.py runserver 0.0.0.0:3000"
 
 [[ports]]
-localPort = 5000
+localPort = 3000
 externalPort = 80

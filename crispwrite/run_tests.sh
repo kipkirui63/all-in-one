@@ -2,7 +2,7 @@
 #!/bin/bash
 
 echo "Starting Django server in background..."
-python manage.py runserver 0.0.0.0:5000 &
+python manage.py runserver 0.0.0.0:3000 &
 SERVER_PID=$!
 
 echo "Waiting for server to start..."

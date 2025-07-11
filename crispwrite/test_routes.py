@@ -3,7 +3,7 @@ import requests
 import json
 from datetime import datetime
 
-BASE_URL = "http://0.0.0.0:5000"
+BASE_URL = "http://0.0.0.0:3000"
 
 def test_api_routes():
     """Test all API routes"""
