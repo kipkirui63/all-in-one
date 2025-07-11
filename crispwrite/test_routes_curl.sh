@@ -84,9 +84,12 @@ echo -e "\n10. Testing Book Meeting..."
 curl -s -w "Status: %{http_code}\n" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Test Meeting",
+    "name": "Test User",
+    "email": "test@example.com",
+    "meeting_type": "AI Consultation",
+    "preferred_date": "2024-12-31T10:00:00Z",
     "description": "This is a test meeting",
-    "scheduled_time": "2024-12-31T10:00:00Z"
+    "timezone": "UTC"
   }' \
   "$BASE_URL/api/meetings/book" | head -20
 

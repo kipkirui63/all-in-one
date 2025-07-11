@@ -141,9 +141,14 @@ def book_meeting(request):
     try:
         data = json.loads(request.body)
         meeting = Meeting.objects.create(
-            title=data.get('title'),
-            description=data.get('description'),
-            scheduled_time=data.get('scheduled_time')
+            name=data.get('name', 'Test User'),
+            email=data.get('email', 'test@example.com'),
+            meeting_type=data.get('meeting_type', 'AI Consultation'),
+            preferred_date=data.get('preferred_date', data.get('scheduled_time')),
+            timezone=data.get('timezone', 'UTC'),
+            description=data.get('description', ''),
+            phone=data.get('phone', ''),
+            company=data.get('company', '')
         )
         return Response({'message': 'Meeting booked successfully', 'id': meeting.id}, status=status.HTTP_201_CREATED)
     except Exception as e:
@@ -155,9 +160,12 @@ def get_meetings(request):
     meetings = Meeting.objects.all()
     return Response([{
         'id': m.id,
-        'title': m.title,
+        'name': m.name,
+        'email': m.email,
+        'meeting_type': m.meeting_type,
+        'preferred_date': m.preferred_date,
         'description': m.description,
-        'scheduled_time': m.scheduled_time,
+        'status': m.status,
         'created_at': m.created_at
     } for m in meetings])
 
@@ -168,9 +176,12 @@ def get_meeting(request, meeting_id):
         meeting = Meeting.objects.get(id=meeting_id)
         return Response({
             'id': meeting.id,
-            'title': meeting.title,
+            'name': meeting.name,
+            'email': meeting.email,
+            'meeting_type': meeting.meeting_type,
+            'preferred_date': meeting.preferred_date,
             'description': meeting.description,
-            'scheduled_time': meeting.scheduled_time,
+            'status': meeting.status,
             'created_at': meeting.created_at
         })
     except Meeting.DoesNotExist:
@@ -182,9 +193,12 @@ def update_meeting(request, meeting_id):
     try:
         meeting = Meeting.objects.get(id=meeting_id)
         data = json.loads(request.body)
-        meeting.title = data.get('title', meeting.title)
+        meeting.name = data.get('name', meeting.name)
+        meeting.email = data.get('email', meeting.email)
+        meeting.meeting_type = data.get('meeting_type', meeting.meeting_type)
+        meeting.preferred_date = data.get('preferred_date', meeting.preferred_date)
         meeting.description = data.get('description', meeting.description)
-        meeting.scheduled_time = data.get('scheduled_time', meeting.scheduled_time)
+        meeting.status = data.get('status', meeting.status)
         meeting.save()
         return Response({'message': 'Meeting updated successfully'})
     except Meeting.DoesNotExist:
