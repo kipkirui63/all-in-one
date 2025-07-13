@@ -1,7 +1,7 @@
 import stripe
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -11,15 +11,12 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 from django.core.mail import EmailMultiAlternatives
 from .models import User, Tool, Subscription
-from .serializers import LoginSerializer, ToolSerializer
+from .serializers import LoginSerializer,ToolSerializer
 from .utils import generate_activation_link
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
-import json
-import os
-from rest_framework import status
-from .serializers import UserSerializer
+from django.urls import reverse
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -149,7 +146,8 @@ def register(request):
 </html>
         """
 
-        subject = "🎉 Welcome to CRISP AI – Let's Build the Future Together!"
+
+        subject = "🎉 Welcome to CRISP AI – Let’s Build the Future Together!"
         text_body = f"Hi {data['first_name']},\n\nClick the link below to activate your account:\n\n{activation_url}"
         from_email = settings.DEFAULT_FROM_EMAIL
         msg = EmailMultiAlternatives(subject, text_body, from_email, [user.email])
@@ -167,32 +165,14 @@ def activate(request, uidb64, token):
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        return HttpResponse("Invalid activation link", status=400)
+        user = None
 
-    if default_token_generator.check_token(user, token):
+    if user and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return HttpResponse("""
-            <html>
-              <head>
-                <title>Account Activated</title>
-                <style>
-                  body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f5f7fb; padding: 60px; }
-                  .box { background: white; display: inline-block; padding: 40px 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-                  h1 { color: #2ecc71; }
-                  a { color: #002B5B; text-decoration: none; font-weight: bold; }
-                </style>
-              </head>
-              <body>
-                <div class="box">
-                  <h1>Your account has been successfully activated!</h1>
-                  <p>You can now return to <a href="https://crispai.crispvision.org">CRISP AI</a> and log in.</p>
-                </div>
-              </body>
-            </html>
-        """)
+        return Response({"detail": "Account activated successfully. You can now log in."})
     else:
-        return HttpResponse("Invalid or expired activation link.", status=400)
+        return Response({"error": "Activation link is invalid or expired."}, status=400)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -234,7 +214,7 @@ def check_subscription(request):
 def agent_gateway(request):
     user = request.user
     if user.role == "agent":
-        return redirect("https://crispai.crispvision.org/agent-dashboard")
+        return redirect("https://www.crispai.ca/agent-dashboard")
     return Response({"detail": "Unauthorized"}, status=403)
 
 @api_view(["POST"])
@@ -247,6 +227,7 @@ def create_checkout(request):
         return Response({"detail": "Missing tool_id"}, status=400)
 
     try:
+        # Check if the tool_input is a digit (numeric ID), otherwise use name
         if str(tool_input).isdigit():
             tool = Tool.objects.get(id=int(tool_input))
         else:
@@ -264,7 +245,7 @@ def create_checkout(request):
             }],
             mode='subscription',
             subscription_data={"trial_period_days": 7},
-            success_url="https://marketplace.crispai.ca/?status=success&session_id={CHECKOUT_SESSION_ID}",
+             success_url="https://marketplace.crispai.ca/?status=success&session_id={CHECKOUT_SESSION_ID}",
             cancel_url="http://localhost:8080/cancel",
             metadata={"tool_id": str(tool.id)}
         )
@@ -283,7 +264,8 @@ def stripe_webhook(request):
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
-    except Exception:
+    except Exception as e:
+        print("Invalid webhook signature:", e)
         return HttpResponse(status=400)
 
     if event["type"] == "checkout.session.completed":
@@ -294,16 +276,22 @@ def stripe_webhook(request):
         try:
             user = User.objects.get(email=email)
             tool = Tool.objects.get(id=tool_id)
-            Subscription.objects.create(
+
+            Subscription.objects.update_or_create(
                 user=user,
                 tool=tool,
-                status="active",
-                email=email
+                defaults={
+                    "status": "active",
+                    "email": email
+                }
             )
-        except Exception:
+        except Exception as e:
+            print("Webhook processing error:", e)
             return HttpResponse(status=400)
 
     return HttpResponse(status=200)
+
+
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
@@ -312,38 +300,76 @@ def list_tools(request):
     serializer = ToolSerializer(tools, many=True)
     return Response(serializer.data)
 
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def activate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return HttpResponse("Invalid activation link", status=400)
+
+    if default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return HttpResponse("""
+            <html>
+              <head>
+                <title>Account Activated</title>
+                <style>
+                  body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f5f7fb; padding: 60px; }
+                  .box { background: white; display: inline-block; padding: 40px 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+                  h1 { color: #2ecc71; }
+                  a { color: #002B5B; text-decoration: none; font-weight: bold; }
+                </style>
+              </head>
+              <body>
+                <div class="box">
+                  <h1>Your account has been successfully activated!</h1>
+                  <p>You can now return to <a href="https://www.marketplace.crispai.ca">CRISP AI</a> and log in.</p>
+                </div>
+              </body>
+            </html>
+        """)
+    else:
+        return HttpResponse("Invalid or expired activation link.", status=400)
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def cancel_subscription(request):
     user = request.user
     tool_id = request.data.get("tool_id")
-
+    
     if not tool_id:
         return Response({"detail": "tool_id is required"}, status=400)
-
+    
     try:
+        # Find the active subscription
         subscription = Subscription.objects.get(
             user=user,
             tool_id=tool_id,
             status="active"
         )
-
+        
+        # Update the subscription status to canceled
         subscription.status = "canceled"
         subscription.save()
-
+        
         return Response({"detail": "Subscription canceled successfully"})
-
+        
     except Subscription.DoesNotExist:
         return Response({"detail": "Active subscription not found"}, status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
-
+    
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def my_subscriptions(request):
     user = request.user
     subscriptions = Subscription.objects.filter(user=user)
-
+    
     data = [{
         "id": sub.id,
         "tool": sub.tool.name,
@@ -352,5 +378,5 @@ def my_subscriptions(request):
         "created_at": sub.created_at,
         "updated_at": sub.updated_at
     } for sub in subscriptions]
-
+    
     return Response(data)

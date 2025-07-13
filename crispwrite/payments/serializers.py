@@ -34,6 +34,4 @@ class ToolSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     description = serializers.CharField()
-    category = serializers.CharField()
-    price = serializers.DecimalField(max_digits=10, decimal_places=2)
     is_active = serializers.BooleanField()
